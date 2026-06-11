@@ -48,7 +48,7 @@ class HouseScene extends AdventureScene {
             if (this.hasItem("key")) {
                 this.loseItem("key");
                 this.showMessage("*squeak*");
-                this.gotoScene('outro');
+                this.gotoScene('goodEnding');
             }
             else {
                 this.showMessage("Wait, where's my key?");
