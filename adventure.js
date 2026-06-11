@@ -230,4 +230,33 @@ class AdventureScene extends Phaser.Scene {
     onEnter() {
         console.warn('This AdventureScene did not implement onEnter():', this.constructor.name);
     }
+
+    initItem(item, x, y, onHover, onClick) {
+        let text = this.add.text(this.w * x + 30, this.w * y, item)
+        .setFontSize(this.s * 2)
+        .setInteractive()
+        .setAlign('center')
+        .on('pointerover', () => this.showMessage(onHover))
+        .on('pointerdown', () => this.showMessage(onClick))
+        .setDepth(10)
+
+        if (item === "🔑") {
+            text.setAlpha(0.5).setTint(0xC0C0C0);
+        }
+        else if (item === "🦅" || item === "🐍" || item === "🐿") {
+            text.setFontSize(this.s * 5)
+            return text;
+        }
+        else {
+            this.add.rectangle(text.x, text.y, text.width, text.height, 0xff0000, 0.4)
+            .setOrigin(0)
+            .setDepth(0)
+        }
+        return text;
+    }
+
+    addBackground(image) {
+        let bg = this.add.image(0, 0, image).setOrigin(0, 0);
+        bg.setDisplaySize(this.w * .75, this.h);
+    }
 }

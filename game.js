@@ -1,34 +1,140 @@
-class Demo1 extends AdventureScene {
+class FieldScene extends AdventureScene {
     constructor() {
-        super("demo1", "First Room");
+        super("field", "Scenic Field");
+    }
+
+    preload() {
+        this.load.setPath("assets/")
+        this.load.image("field", "field.jpeg");
     }
 
     onEnter() {
 
-        let clip = this.add.text(this.w * 0.3, this.w * 0.3, "📎 paperclip")
-            .setFontSize(this.s * 2)
-            .setInteractive()
-            .on('pointerover', () => this.showMessage("Metal, bent."))
-            .on('pointerdown', () => {
-                this.showMessage("No touching!");
-                this.tweens.add({
-                    targets: clip,
-                    x: '+=' + this.s,
-                    repeat: 2,
-                    yoyo: true,
-                    ease: 'Sine.inOut',
-                    duration: 100
-                });
-            });
+        this.addBackground("field");
 
-        let key = this.add.text(this.w * 0.5, this.w * 0.1, "🔑 key")
-            .setFontSize(this.s * 2)
-            .setInteractive()
-            .on('pointerover', () => {
-                this.showMessage("It's a nice key.")
+        let dog = this.initItem("Pablo", 0.52, 0.4, "My curious baby...", "*woof woof*")
+
+        let toHouse = this.initItem("Return Home", 0.25, 0.5, "Time to Go Home?", "Come on Pablo!")
+        toHouse.on('pointerdown', () => {
+            this.gotoScene('house');
+        })
+
+        let toPath = this.initItem("Follow Path", 0.25, 0.2, "I bet the view's gorgeous!", "Let's go Pablo!")
+        toPath.on('pointerdown', () => {
+            this.gotoScene('path');
+        })
+
+        this.initItem("🐿", 0.65, 0.2, "Hope Pablo doesn't see that...", "Shoo, shoo!")
+
+    }
+}
+
+class HouseScene extends AdventureScene {
+    constructor() {
+        super("house", "A house and a home.");
+    }
+
+    preload() {
+        this.load.setPath("assets/")
+        this.load.image("house", "house.jpeg");
+    }
+
+    onEnter() {
+
+        this.addBackground("house");
+
+        let enterHouse = this.initItem("Go Home", 0.34, 0.3, "Pablo seems like he's tired out...")
+        enterHouse.on('pointerdown', () => {
+            if (this.hasItem("key")) {
+                this.loseItem("key");
+                this.showMessage("*squeak*");
+                this.gotoScene('outro');
+            }
+            else {
+                this.showMessage("Wait, where's my key?");
+            }
             })
+    
+        let toPath = this.initItem("Go Back", 0.03, 0.5, "I never get tired of the view from uphill...", "Let's Go!")
+        toPath.on('pointerdown', () => {
+            this.gotoScene('field'); 
+        })
+    }
+}
+
+class PathScene extends AdventureScene {
+    constructor() {
+        super("path", "Dirt Mulholland Trail");
+    }
+    preload() {
+        this.load.setPath("assets/")
+        this.load.image("path", "path.jpeg");
+    }
+    onEnter() {
+
+        this.addBackground("path");
+
+        let toField = this.initItem("Go Back", 0.52, 0.5, "Downhill's always easier.", "Away we go!")
+        toField.on('pointerdown', () => {
+            this.gotoScene('field'); 
+        })
+
+        let toHilltop = this.initItem("Go Up", 0.6, 0.4, "We're almost at the top...", "One last push!")
+        toHilltop.on('pointerdown', () => {
+            this.gotoScene("hilltop"); 
+        })
+
+        let snake = this.initItem("🐍", 0.3, 0.43, "Better be careful around these parts!", "*SSSSSSS*")
+        this.tweens.add({
+            targets: snake,
+            ease: 'linear',
+            duration: 1000,
+            x: snake.x - Phaser.Math.Between(0, 100),
+            y: snake.y + Phaser.Math.Between(-20, 70),
+            loop: -1,
+            yoyo: true
+        })
+
+    }
+}
+
+class HilltopScene extends AdventureScene {
+    constructor() {
+        super("hilltop", "Pablo & the San Fernando Valley");
+    }
+    preload() {
+        this.load.setPath("assets/")
+        this.load.image("hilltop", "hilltop.jpeg");
+    }
+    onEnter() {
+
+        this.addBackground("hilltop");
+        this.showMessage("What a beautiful view!");
+
+        let toBadEnding = this.initItem("Take the Fast\nWay Down", 0.01, 0.35, "Time to Go Home?", "WoooaoaoaAHHHhh!!!!")
+        toBadEnding.on('pointerdown', () => {
+            this.gotoScene('badEnding');
+        })
+
+        let toPath = this.initItem("Walk Back\nDown", 0.03, 0.4, "Time to Go Home?", "Let's hit it!")
+        toPath.on('pointerdown', () => {
+            this.gotoScene('path');
+        })
+        
+        this.initItem("Pablo", 0.35, 0.51, "Look at that happy puppy...", "*excited dog noises*")
+
+        let bird = this.initItem("🦅", 0.72, 0.03, "Woah an eagle!", "*CACAW*");
+        this.tweens.add({
+            targets: bird,
+            ease: 'power0',
+            duration: 750,
+            x: -15,
+            y: bird.y + 170,
+            loop: -1
+        })
+        
+        let key = this.initItem("🔑", 0.6, 0.5, "Is that...?!", "I found the key!")
             .on('pointerdown', () => {
-                this.showMessage("You pick up the key.");
                 this.gainItem('key');
                 this.tweens.add({
                     targets: key,
@@ -38,81 +144,68 @@ class Demo1 extends AdventureScene {
                     onComplete: () => key.destroy()
                 });
             })
-
-        let door = this.add.text(this.w * 0.1, this.w * 0.15, "🚪 locked door")
-            .setFontSize(this.s * 2)
-            .setInteractive()
-            .on('pointerover', () => {
-                if (this.hasItem("key")) {
-                    this.showMessage("You've got the key for this door.");
-                } else {
-                    this.showMessage("It's locked. Can you find a key?");
-                }
-            })
-            .on('pointerdown', () => {
-                if (this.hasItem("key")) {
-                    this.loseItem("key");
-                    this.showMessage("*squeak*");
-                    door.setText("🚪 unlocked door");
-                    this.gotoScene('demo2');
-                }
-            })
-
     }
 }
-
-class Demo2 extends AdventureScene {
-    constructor() {
-        super("demo2", "The second room has a long name (it truly does).");
-    }
-    onEnter() {
-        this.add.text(this.w * 0.3, this.w * 0.4, "just go back")
-            .setFontSize(this.s * 2)
-            .setInteractive()
-            .on('pointerover', () => {
-                this.showMessage("You've got no other choice, really.");
-            })
-            .on('pointerdown', () => {
-                this.gotoScene('demo1');
-            });
-
-        let finish = this.add.text(this.w * 0.6, this.w * 0.2, '(finish the game)')
-            .setInteractive()
-            .on('pointerover', () => {
-                this.showMessage('*giggles*');
-                this.tweens.add({
-                    targets: finish,
-                    x: this.s + (this.h - 2 * this.s) * Math.random(),
-                    y: this.s + (this.h - 2 * this.s) * Math.random(),
-                    ease: 'Sine.inOut',
-                    duration: 500
-                });
-            })
-            .on('pointerdown', () => this.gotoScene('outro'));
-    }
-}
-
 class Intro extends Phaser.Scene {
     constructor() {
         super('intro')
     }
     create() {
-        this.add.text(50,50, "Adventure awaits!").setFontSize(50);
-        this.add.text(50,100, "Click anywhere to begin.").setFontSize(20);
+        this.add.text(50,50, "Welcome to").setFontSize(50);
+        this.add.text(50,100, "Dude, Where's My Key?").setFontSize(75);
+
+        let blink = this.add.text(50,175, "Click anywhere to begin.").setFontSize(25);
+        this.tweens.add({
+            targets: blink,
+            alpha: 0,
+            loop: -1,
+            yoyo: true,
+            duration: 500
+        })
+
         this.input.on('pointerdown', () => {
             this.cameras.main.fade(1000, 0,0,0);
-            this.time.delayedCall(1000, () => this.scene.start('demo1'));
+            this.time.delayedCall(1000, () => this.scene.start('field'));
         });
     }
 }
-
-class Outro extends Phaser.Scene {
+//TODO
+class GoodEnding extends Phaser.Scene {
     constructor() {
-        super('outro');
+        super('goodEnding');
     }
     create() {
-        this.add.text(50, 50, "That's all!").setFontSize(50);
-        this.add.text(50, 100, "Click anywhere to restart.").setFontSize(20);
+        this.add.text(50, 50, "Congrats!\nYou successfully made it home safely!").setFontSize(50);
+
+        let blink = this.add.text(50, 160, "Click anywhere to begin.").setFontSize(25);
+        this.tweens.add({
+            targets: blink,
+            alpha: 0,
+            loop: -1,
+            yoyo: true,
+            duration: 500
+        })
+
+        this.input.on('pointerdown', () => this.scene.start('intro'));
+    }
+}
+//TODO
+class BadEnding extends Phaser.Scene {
+    constructor() {
+        super('badEnding');
+    }
+    create() {
+        this.add.text(50, 50, "Yikes, you rolled down a cliff!\nPablo watches in dissapointment as you writhe in agony...").setFontSize(50);
+
+        let blink = this.add.text(50, 160, "Click anywhere to try again.").setFontSize(25);
+        this.tweens.add({
+            targets: blink,
+            alpha: 0,
+            loop: -1,
+            yoyo: true,
+            duration: 500
+        })
+
         this.input.on('pointerdown', () => this.scene.start('intro'));
     }
 }
@@ -125,7 +218,7 @@ const game = new Phaser.Game({
         width: 1920,
         height: 1080
     },
-    scene: [Intro, Demo1, Demo2, Outro],
-    title: "Adventure Game",
+    scene: [ Intro, FieldScene, PathScene, HilltopScene, HouseScene, GoodEnding, BadEnding ],
+    title: "Dude, Where's My Key?",
 });
 
